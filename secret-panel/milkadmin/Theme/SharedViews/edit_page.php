@@ -1,0 +1,46 @@
+<?php
+namespace Modules\Posts\Views;
+use Builders\TitleBuilder;
+
+!defined('MILK_DIR') && die(); // Avoid direct access
+/**
+ * Variables:
+ * $title - string
+ * $title_btns - array [label, link, color][]
+ * $description - string
+ * $form - string
+ */
+$title = is_string($title ?? null) ? $title : '';
+$form = is_string($form ?? null) ? $form : '';
+$title_btns = (isset($title_btns) && is_array($title_btns)) ? $title_btns : [];
+?>
+<div class="row">
+    <?php if (isset($sidebar)) : ?>
+        <div class="col-md-3">
+            <?php _ph($sidebar); ?>
+        </div>
+    <?php endif; ?>
+    <div class="<?php _p((isset($sidebar)) ? 'col-md-9' : 'col-md-12'); ?>">
+        <div class="card">
+            <?php if ($title !== '' || $title_btns !== []) : ?>
+            <div class="card-header">
+                <?php 
+                    $title_builder = TitleBuilder::create($title );
+                    foreach ($title_btns as $btn) {
+                        $title_builder->addButton($btn['label'], $btn['link'], $btn['color'] ?? 'primary');
+                    }
+                    echo $title_builder;
+                ?>
+            </div>
+            <?php endif; ?>
+            <div class="card-body">
+                <?php if (isset($description)) { ?>
+                    <p class="text-body-secondary mb-3"><?php _pt($description); ?></p>
+                <?php } ?>
+                <div class="form-group col-xl-8 col-lg-12">
+                    <?php echo $form; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

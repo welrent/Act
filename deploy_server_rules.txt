@@ -1,0 +1,18 @@
+# Protect configuration and vault files deeply from HTTP access
+<Files ~ "\.(ini|log|md|sql)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Next.js Routing Simulation via Apache Rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Ignore existing physical files and folders (e.g., CSS/JS/IMG)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Reroute ALL missing virtual routes dynamically to the index.php proxy
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>

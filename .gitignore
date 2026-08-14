@@ -1,0 +1,8 @@
+.DS_Store
+*.jdk
+*.jdk.zip
+openJdk-25.jdk
+openJdk-25.jdk.zip
+node_modules/
+**/node_modules/
+.next/

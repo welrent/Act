@@ -1,0 +1,20 @@
+{
+    "module_version": {
+        "auth": {
+            "version": "1.0.0",
+            "folder": "Auth"
+        },
+        "docs": {
+            "version": "0.251005",
+            "folder": "Docs"
+        },
+        "install": {
+            "version": "0.251100",
+            "folder": "Install"
+        },
+        "projects": {
+            "version": "1.0.0",
+            "folder": "Projects"
+        }
+    }
+}

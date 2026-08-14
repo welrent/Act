@@ -1,0 +1,20 @@
+<?php
+return [
+    'back_to_home' => 'Back to Home',
+    'not_logged_in' => 'You are not logged in',
+    'search_placeholder' => 'Search...',
+    'search_shortcut' => 'K',
+    'terms_of_use' => 'Terms of Use',
+    'terms_desc' => 'Review the rules and guidelines for using the platform.',
+    'accessibility' => 'Accessibility Statement',
+    'accessibility_desc' => 'Our ongoing commitment to digital accessibility for all users.',
+    'privacy' => 'Privacy Statement',
+    'privacy_desc' => 'Information on how we collect, use, and protect your data.',
+    'cookie' => 'Cookie Statement',
+    'cookie_desc' => 'Details regarding our use of cookies and tracking tech.',
+    'car_rental' => 'Car Rental Agreement',
+    'boat_rental' => 'Boat Rental Agreement',
+    'equip_rental' => 'Equipment Rental Agreement',
+    'welcome_msg' => 'Welcome',
+    'welcome_bio' => 'Manage all your rental agreements safely and securely.',
+];

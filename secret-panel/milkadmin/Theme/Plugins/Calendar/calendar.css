@@ -1,0 +1,1179 @@
+/* Calendar Container */
+.calendar-container {
+    max-width: 1400px;
+}
+
+/* Calendar Header */
+.calendar-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px 15px 0 0;
+    margin-bottom: 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Calendar Header Compact - Improved styling */
+.calendar-header-compact {
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.calendar-header-compact:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.calendar-header-compact h5 {
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.calendar-header-compact h5 i {
+    font-size: 1.2rem;
+}
+
+/* Button styling in colored header */
+.calendar-header-compact .btn-light {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.9);
+    color: #495057;
+}
+
+.calendar-header-compact .btn-light:hover {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    background: white;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Weekdays Header */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.calendar-weekday {
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+.border-success .calendar-weekday {
+    color: #FFF;
+}
+
+/* Days Grid */
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: auto;
+    gap: 1px;
+    background: #dee2e6;
+}
+
+/* Individual Day Cell */
+.calendar-day {
+    background: white;
+    padding: 8px;
+    min-height: 100px;
+    position: relative;
+    transition: background-color 0.2s;
+    flex-direction: column;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+}
+
+.calendar-day.other-month {
+    background: #f8f9fa;
+    color: #adb5bd;
+}
+
+.calendar-day.today {
+    background: #e7f3ff;
+}
+
+/* Day Number */
+.day-number {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    color: #495057;
+}
+
+/* Clickable Day Number */
+.day-number-clickable {
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+
+
+/* Clickable Day Number when empty (no appointments) - fills entire day cell */
+.day-number-empty {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    flex: 1;
+    padding: 0;
+    margin: 0;
+}
+
+.day-number-empty:hover, .day-number-clickable:hover {
+    background: rgba(13, 110, 253, 0.05);
+    transform: none;
+}
+
+/* Day Number as Link (for empty date click) - legacy support */
+a.day-number {
+    text-decoration: none;
+    color: #495057;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+a.day-number:hover {
+    color: #0d6efd;
+    transform: scale(1.1);
+}
+
+.calendar-day.today .day-number {
+    background: #0d6efd;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.calendar-day.today a.day-number:hover {
+    background: #0b5ed7;
+    color: white;
+}
+
+/* Appointments Container */
+.appointments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    overflow: visible;
+}
+
+.appointment-group {
+    display: flex;
+    gap: 2px;
+    position: relative;
+}
+
+/* Individual Appointment */
+.appointment {
+    flex: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    transition: all 0.2s;
+    border-left: 3px solid currentColor;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    background-color: #e7e7e7;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Clickable appointment styling */
+.appointment-clickable {
+    cursor: pointer;
+}
+
+.appointment-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.appointment-time {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.7rem;
+}
+
+.appointment-dates {
+    font-size: 0.65rem;
+    display: block;
+    margin-bottom: 2px;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.appointment-title {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Multi-day appointments styling */
+.appointment-multiday {
+    position: relative;
+}
+
+.appointment-multiday::after {
+    content: '↔';
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+.appointment-first-day {
+    border-radius: 4px 0 0 4px;
+}
+
+.appointment-last-day {
+    border-radius: 0 4px 4px 0;
+}
+
+.appointment-first-day.appointment-last-day {
+    border-radius: 4px;
+}
+
+/* Predefined color classes for appointments */
+.appointment.event-primary, .weekly-allday-appointment.event-primary {
+    background-color: #cfe2ff;
+    border-left-color: #0d6efd;
+    color: #084298;
+}
+
+.appointment.event-success, .weekly-allday-appointment.event-success {
+    background-color: #d1e7dd;
+    border-left-color: #198754;
+    color: #0f5132;
+}
+
+.appointment.event-danger, .weekly-allday-appointment.event-danger {
+    background-color: #f8d7da;
+    border-left-color: #dc3545;
+    color: #842029;
+}
+
+.appointment.event-warning, .weekly-allday-appointment.event-warning {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+    color: #997404;
+}
+
+.appointment.event-info, .weekly-allday-appointment.event-info {
+    background-color: #cff4fc;
+    border-left-color: #0dcaf0;
+    color: #055160;
+}
+
+.appointment.event-secondary, .weekly-allday-appointment.event-secondary {
+    background-color: #e2e3e5;
+    border-left-color: #6c757d;
+    color: #41464b;
+}
+
+.weekly-appointment.event-primary, .weekly-allday-appointment.event-primary {
+    background-color: #cfe2ff;
+    border-left-color: #0d6efd;
+    color: #084298;
+}
+
+.weekly-appointment.event-success, .weekly-allday-appointment.event-success {
+    background-color: #d1e7dd;
+    border-left-color: #198754;
+    color: #0f5132;
+}
+
+.weekly-appointment.event-danger, .weekly-allday-appointment.event-danger {
+    background-color: #f8d7da;
+    border-left-color: #dc3545;
+    color: #842029;
+}
+
+.weekly-appointment.event-warning, .weekly-allday-appointment.event-warning {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+    color: #997404;
+}
+
+.weekly-appointment.event-info, .weekly-allday-appointment.event-info {
+    background-color: #cff4fc;
+    border-left-color: #0dcaf0;
+    color: #055160;
+}
+
+.weekly-appointment.event-secondary, .weekly-allday-appointment.event-secondary {
+    background-color: #e2e3e5;
+    border-left-color: #6c757d;
+    color: #41464b;
+}
+
+/* Modal Styling */
+.appointment-modal .modal-header {
+    border-bottom: 3px solid;
+}
+
+.appointment-detail {
+    margin-bottom: 15px;
+}
+
+.appointment-detail-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.appointment-detail-value {
+    color: #212529;
+    font-size: 1rem;
+}
+
+/* Compact Calendar Mode - Fully Responsive */
+.calendar-compact {
+    width: 100%;
+    max-width: 1000px;
+    font-size: clamp(8px, 1.8vw, 16px);
+}
+
+.calendar-compact .calendar-header-compact {
+    padding: 0.5em 0.8em;
+}
+
+.calendar-compact .calendar-header-compact h5 {
+    font-size: 0.9em;
+}
+
+.calendar-compact .calendar-header-compact .btn-sm {
+    padding: 0.2em 0.4em;
+    font-size: 0.75em;
+}
+
+.calendar-compact .calendar-header-compact .form-select-sm {
+    padding: 0.2em 0.4em;
+    font-size: 0.75em;
+    min-width: 5em !important;
+}
+
+.calendar-compact .calendar-weekday {
+    padding: 0.3em 0.2em;
+    font-size: clamp(10px, 0.6em, 24px);
+}
+
+.calendar-compact .calendar-day {
+    min-height: 0;
+    padding: 0.15em;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-compact .day-number {
+    font-size: clamp(10px, 0.7em, 28px);
+    margin: 0;
+    text-align: center;
+    line-height: 1;
+}
+
+.calendar-compact .appointments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+    width: 100%;
+    align-items: center;
+    margin-top: 0.2em;
+}
+
+.calendar-compact .appointment {
+    font-size: 0.5em;
+    padding: 0.1em 0.2em;
+    line-height: 1.1;
+    min-height: 0;
+}
+
+.calendar-compact .appointment-time {
+    font-size: 0.9em;
+    margin-bottom: 0;
+}
+
+.calendar-compact .appointment-title {
+    font-size: 1em;
+}
+
+/* Days with Appointments Highlighting */
+.calendar-day.has-appointments .day-number {
+    position: relative;
+}
+
+
+.calendar-day.has-appointments.today .day-number::after {
+    background-color: white;
+    bottom: 2px;
+}
+
+/* Alternative highlighting: Circle around the day number */
+.calendar-day.has-appointments .day-number {
+    border: 2px solid #0d6efd;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.calendar-day.has-appointments.today .day-number {
+    border-color: white;
+}
+
+/* Compact calendar with appointments highlighting */
+.calendar-compact .calendar-day.has-appointments .day-number {
+    width: 70%;
+    height: 70%;
+    background: #0d6efd;
+    color: #FFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Compact calendar today styling - square instead of circle */
+.calendar-compact .calendar-day.today .day-number {
+    width: 60%;
+    height: 60%;
+    background: #FFF;
+    color: #1c1c1c;
+    border: none;
+    border-radius: 0.2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(10px, 0.7em, 28px);
+}
+
+/* Remove circle border for today even if it has appointments */
+.calendar-compact .calendar-day.today.has-appointments .day-number {
+    border: none;
+    border-radius: 0.2em;
+}
+
+/* Clickable Day Number with Appointments */
+.day-number-with-appointments {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.day-number-with-appointments:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: scale(1.05);
+}
+
+a.day-number-with-appointments {
+    text-decoration: none;
+    color: inherit;
+}
+
+a.day-number-with-appointments:hover {
+    color: #0d6efd;
+}
+
+/* Custom Cell Styling */
+.calendar-day.custom-cell {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.calendar-day.custom-cell:hover {
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.calendar-day.custom-cell.has-appointments {
+    border: 2px solid rgba(13, 110, 253, 0.3);
+}
+
+.calendar-day.custom-cell.today {
+    border: 2px solid #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 10px;
+    }
+
+    .calendar-header {
+        padding: 20px;
+    }
+
+    .calendar-days {
+        grid-auto-rows: auto;
+    }
+    
+    .calendar-day {
+        min-height: 60px;
+        padding: 5px;
+    }
+    
+    .appointment {
+        font-size: 0.7rem;
+        padding: 3px 5px;
+    }
+    
+    .day-number {
+        font-size: 0.85rem;
+    }
+
+    .calendar-weekday {
+        padding: 10px 5px;
+        font-size: 0.75rem;
+    }
+    
+    .appointment-dates {
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .calendar-days {
+        grid-auto-rows: auto;
+    }
+    
+    .calendar-day {
+        min-height: 50px;
+        padding: 3px;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    .appointment {
+        font-size: 0.65rem;
+        padding: 2px 4px;
+    }
+
+    .appointment-time {
+        font-size: 0.6rem;
+    }
+    
+    .appointment-dates {
+        font-size: 0.55rem;
+    }
+}
+
+
+/**
+ * Weekly Calendar View Styles
+ * 
+ * CSS completo per la visualizzazione settimanale del calendario
+ */
+
+/* ============================================================================
+   WEEKLY VIEW CONTAINER
+   ============================================================================ */
+
+.weekly-view {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+/* ============================================================================
+   WEEKLY HEADER - Day Names and Dates
+   ============================================================================ */
+
+.weekly-header {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    border-bottom: 2px solid #dee2e6;
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.weekly-time-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    border-right: 1px solid #dee2e6;
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.weekly-timezone {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.weekly-day-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    border-right: 1px solid #dee2e6;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.weekly-day-header:last-child {
+    border-right: none;
+}
+
+.weekly-day-header:hover {
+    background: #e9ecef;
+}
+
+.weekly-day-header.weekly-today {
+    background: #e7f3ff;
+}
+
+.weekly-day-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.weekly-today .weekly-day-name {
+    color: #0d6efd;
+}
+
+.weekly-day-number {
+    font-weight: 700;
+    color: #212529;
+    position: relative;
+}
+
+.weekly-today .weekly-day-number {
+    color: #0d6efd;
+    background: #0d6efd;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.weekly-count-badge {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    background: #dc3545;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* ============================================================================
+   ALL-DAY EVENTS SECTION
+   ============================================================================ */
+
+.weekly-allday-container {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+    min-height: 40px;
+}
+
+.weekly-allday-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-right: 1px solid #dee2e6;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.weekly-allday-cell {
+    border-right: 1px solid #dee2e6;
+    padding: 4px;
+    min-height: 40px;
+}
+
+.weekly-allday-cell:last-child {
+    border-right: none;
+}
+
+.weekly-allday-appointment {
+    background: #0d6efd;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+
+/* ============================================================================
+   WEEKLY BODY - Time Grid
+   ============================================================================ */
+
+.weekly-body-container {
+    position: relative;
+    overflow-y: auto;
+}
+
+.weekly-body {
+    position: relative;
+    z-index: 1;
+}
+
+.weekly-time-row {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    border-bottom: 1px solid #e9ecef;
+    position: relative;
+}
+
+.weekly-time-row:last-child {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.weekly-time-label {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4px 8px;
+    border-right: 1px solid #dee2e6;
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+    background: #f8f9fa;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+.weekly-time-slot {
+    border-right: 1px solid #e9ecef;
+    position: relative;
+    background: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.weekly-time-slot:hover {
+    background: #f8f9fa;
+}
+
+.weekly-time-slot:last-child {
+    border-right: none;
+}
+
+.weekly-half-hour-guide {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #f1f3f5;
+}
+
+/* ============================================================================
+   APPOINTMENTS OVERLAY
+   ============================================================================ */
+
+.weekly-appointments-overlay {
+    position: absolute;
+    top: 0;
+    left: 80px;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.weekly-appointment {
+    position: absolute;
+    background: #0d6efd;
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+    pointer-events: auto;
+    border-left: 3px solid #0b5ed7;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.weekly-appointment:hover {
+   
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 500;
+    transform: scale(1.005);
+}
+
+.weekly-appointment-time {
+    font-weight: 600;
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+    opacity: 0.9;
+}
+
+.weekly-appointment-title {
+    font-weight: 500;
+    line-height: 1.2;
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Compact view for short appointments */
+.weekly-appointment-compact {
+    padding: 2px 6px;
+}
+
+.weekly-appointment-compact .weekly-appointment-time {
+    font-size: 0.65rem;
+    margin-bottom: 0;
+}
+
+.weekly-appointment-compact .weekly-appointment-title {
+    font-size: 0.7rem;
+    -webkit-line-clamp: 1;
+}
+
+/* ============================================================================
+   APPOINTMENT COLORS
+   ============================================================================ */
+
+/* Primary */
+.weekly-appointment.appointment-primary,
+.weekly-allday-appointment.appointment-primary {
+    background: #0d6efd;
+    border-left-color: #0b5ed7;
+}
+
+.weekly-appointment.appointment-primary:hover,
+.weekly-allday-appointment.appointment-primary:hover {
+    background: #0b5ed7;
+}
+
+/* Success */
+.weekly-appointment.appointment-success,
+.weekly-allday-appointment.appointment-success {
+    background: #198754;
+    border-left-color: #157347;
+}
+
+.weekly-appointment.appointment-success:hover,
+.weekly-allday-appointment.appointment-success:hover {
+    background: #157347;
+}
+
+/* Danger */
+.weekly-appointment.appointment-danger,
+.weekly-allday-appointment.appointment-danger {
+    background: #dc3545;
+    border-left-color: #bb2d3b;
+}
+
+.weekly-appointment.appointment-danger:hover,
+.weekly-allday-appointment.appointment-danger:hover {
+    background: #bb2d3b;
+}
+
+/* Warning */
+.weekly-appointment.appointment-warning,
+.weekly-allday-appointment.appointment-warning {
+    background: #ffc107;
+    color: #000;
+    border-left-color: #ffca2c;
+}
+
+.weekly-appointment.appointment-warning:hover,
+.weekly-allday-appointment.appointment-warning:hover {
+    background: #ffca2c;
+}
+
+/* Info */
+.weekly-appointment.appointment-info,
+.weekly-allday-appointment.appointment-info {
+    background: #0dcaf0;
+    color: #000;
+    border-left-color: #31d2f2;
+}
+
+.weekly-appointment.appointment-info:hover,
+.weekly-allday-appointment.appointment-info:hover {
+    background: #31d2f2;
+}
+
+/* Secondary */
+.weekly-appointment.appointment-secondary,
+.weekly-allday-appointment.appointment-secondary {
+    background: #6c757d;
+    border-left-color: #5c636a;
+}
+
+.weekly-appointment.appointment-secondary:hover,
+.weekly-allday-appointment.appointment-secondary:hover {
+    background: #5c636a;
+}
+
+/* Dark */
+.weekly-appointment.appointment-dark,
+.weekly-allday-appointment.appointment-dark {
+    background: #212529;
+    border-left-color: #1c1f23;
+}
+
+.weekly-appointment.appointment-dark:hover,
+.weekly-allday-appointment.appointment-dark:hover {
+    background: #1c1f23;
+}
+
+/* ============================================================================
+   WEEKLY DATE RANGE INDICATOR
+   ============================================================================ */
+
+.weekly-date-range {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #212529;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 992px) {
+    .weekly-header {
+        grid-template-columns: 60px repeat(7, 1fr);
+    }
+    
+    .weekly-body {
+        grid-template-columns: 60px repeat(7, 1fr);
+    }
+    
+    .weekly-time-label {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+    }
+    
+    .weekly-day-name {
+        font-size: 0.7rem;
+    }
+    
+    .weekly-day-number {
+        font-size: .8rem;
+    }
+    
+    .weekly-appointment {
+        padding: 2px 4px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 768px) {
+    
+    .weekly-time-column-header,
+    .weekly-allday-label {
+        font-size: 0.7rem;
+    }
+    
+    .weekly-appointment-title {
+        -webkit-line-clamp: 1;
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    .weekly-body-container {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .weekly-appointment:hover {
+        transform: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    
+    .weekly-time-slot:hover {
+        background: #ffffff;
+    }
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING (Optional)
+   ============================================================================ */
+
+.weekly-body-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.weekly-body-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.weekly-body-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.weekly-body-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.weekly-view.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.weekly-view.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0d6efd;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+.weekly-appointment:focus,
+.weekly-time-slot:focus,
+.weekly-allday-appointment:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .weekly-time-row {
+        border-bottom: 2px solid #000;
+    }
+    
+    .weekly-time-slot {
+        border-right: 2px solid #000;
+    }
+    
+    .weekly-appointment {
+        border: 2px solid #000;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .weekly-view {
+        background: #212529;
+    }
+    
+    .weekly-header,
+    .weekly-allday-container {
+        background: #343a40;
+        border-color: #495057;
+    }
+    
+    .weekly-time-label {
+        background: #343a40;
+        color: #adb5bd;
+    }
+    
+    .weekly-time-slot {
+        background: #212529;
+        border-color: #495057;
+    }
+    
+    .weekly-time-slot:hover {
+        background: #343a40;
+    }
+    
+    .weekly-day-name {
+        color: #adb5bd;
+    }
+    
+    .weekly-day-number {
+        color: #f8f9fa;
+    }
+}

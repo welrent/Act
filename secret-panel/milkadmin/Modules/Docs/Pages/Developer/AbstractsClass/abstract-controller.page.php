@@ -1,0 +1,849 @@
+<?php
+namespace Modules\Docs\Pages;
+use App\Route;
+/**
+ * @title Abstract Controller   
+ * @guide developer
+ * @order 50
+ * @tags AbstractController, router, routing, action, attributes, Action, handle_routes, set_handle_routes, access, output_table_response, get_request_params, get_modellist_data, call_table_action, default_request_params, ModelList, table, pagination, sorting, filters, JavaScript, AJAX, theme, permissions, JSON, HTML, offcanvas, table-action, registerHook, fetch, dynamic-table, checkboxes, search, filter_search, add_filter, Theme, CSS, assets, getComponent, reload, set_page
+ */
+!defined('MILK_DIR') && die(); // Avoid direct access
+?>
+<div class="bg-white p-4">
+    <h1>Abstract class router</h1>
+
+    <p>The router class manages module pages. The requested action (for example <code>?page=basemodule&action=my_custom_page</code>) is first matched against methods declared with <code>#[RequestAction]</code>.</p><p>If no attribute route is found, the legacy fallback (<code>actionXxx</code> methods) is used, and only in that fallback path the action string is normalized to alphanumeric/underscore.</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+namespace Modules\BaseModule;
+!defined('MILK_DIR') && die(); // Avoid direct access
+
+class BaseModuleController extends AbstractController
+{
+}
+</code></pre>
+
+    <h2 class="mt-4">Using Action Attributes</h2>
+
+    <p>The <code>#[RequestAction]</code> attribute is used to define which methods respond to specific URL actions. This provides a clean and declarative way to map URLs to methods.</p>
+
+    <h5 class="mt-3">Basic Action Usage</h5>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">use App\Attributes\RequestAction;
+
+class BaseModuleController extends AbstractController
+{
+    #[RequestAction('home')]
+    protected function list() {
+        Response::themePage('default', '<h1>Home Page</h1>');
+    }
+
+    #[RequestAction('edit')]
+    protected function edit() {
+        $id = _absint($_REQUEST['id'] ?? 0);
+        Response::themePage('default', '<h1>Edit Record ' . $id . '</h1>');
+    }
+
+    #[RequestAction('settings')]
+    protected function moduleSettings() {
+        Response::themePage('default', '<h1>Module Settings</h1>');
+    }
+}</code></pre>
+
+    <p><strong>URL Mapping:</strong></p>
+    <ul>
+        <li><code>?page=basemodule</code> or <code>?page=basemodule&action=home</code> → calls <code>list()</code> method</li>
+        <li><code>?page=basemodule&action=edit</code> → calls <code>edit()</code> method</li>
+        <li><code>?page=basemodule&action=settings</code> → calls <code>moduleSettings()</code> method</li>
+    </ul>
+
+    <h5 class="mt-3">Attribute Parameters</h5>
+    <p>The <code>#[RequestAction]</code> attribute accepts the following parameters:</p>
+    <ul>
+        <li><code>action</code>: (string) The action name that will be matched in the URL</li>
+        <li><code>url</code>: (string, optional) Secondary metadata value. Current HTTP routing matches by <code>action</code>.</li>
+    </ul>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">#[RequestAction('custom-name', 'different-url')]
+protected function myMethod() {
+    // Current HTTP routing resolves this with ?page=module&action=custom-name
+}</code></pre>
+
+    <h5 class="mt-3">The home page</h5>
+    <p>The method with <code>#[RequestAction('home')]</code> attribute is called by default when no action is specified in the URL.</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">#[RequestAction('home')]
+protected function home() {
+    Response::themePage('default', '<h1>'.$this->title.'</h1>');
+}</code></pre>
+
+    <h5 class="mt-3">Programmatic Action Registration</h5>
+    <p>
+        You can also register routes without attributes using
+        <code>registerRequestAction(string $action, string|array $handler, ?string $accessLevel = null)</code>.
+    </p>
+    <p><strong>In a Controller:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">class PostsController extends AbstractController
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->registerRequestAction('sync', 'syncAction');
+        $this->registerRequestAction('admin-sync', 'syncAction', 'admin');
+    }
+
+    public function syncAction()
+    {
+        Response::themePage('default', 'Sync completed');
+    }
+}</code></pre>
+
+    <p><strong>In a Controller Extension:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">use App\Abstracts\AbstractControllerExtension;
+
+class Controller extends AbstractControllerExtension
+{
+    public function onInit(): void
+    {
+        $module = $this->module->get();
+        if ($module) {
+            $module->registerRequestAction('ext-sync', [$this, 'extSync']);
+        }
+    }
+
+    public function extSync(): void
+    {
+        Response::themePage('default', 'Extension sync completed');
+    }
+}</code></pre>
+    <p>
+        When a dedicated Controller exists, calling <code>registerRequestAction()</code> from Module/extension is forwarded
+        to the active Controller automatically.
+    </p>
+
+    <h5 class="mt-3">Scope and Priority (Module vs Controller)</h5>
+    <ul>
+        <li>If a dedicated Controller exists, the HTTP route handler is the Controller.</li>
+        <li>In that flow, <code>#[RequestAction]</code> attributes are scanned from Controller and loaded Controller extensions.</li>
+        <li>Attributes declared only on Module methods are not resolved by the active Controller route map.</li>
+        <li>Module/extension code can still expose actions at runtime via <code>registerRequestAction()</code>, which is forwarded to the active Controller.</li>
+        <li>If no dedicated Controller exists, the Module handles routes directly and its own <code>#[RequestAction]</code> methods are used.</li>
+    </ul>
+
+    <h2 class="mt-4">AbstractController Overview</h2>
+
+    <p>The <code>AbstractController</code> class is the foundation for all module controllers in the framework. It provides automatic routing, access control, and integration with the data layer through models. Controllers handle HTTP requests, coordinate with models to fetch/update data, and render views.</p>
+
+    <h3 class="mt-3">Key Features</h3>
+    <ul>
+        <li><strong>Attribute-Based Routing:</strong> Use <code>#[RequestAction]</code> attributes to map URLs to methods</li>
+        <li><strong>Programmatic Routing:</strong> Use <code>registerRequestAction()</code> to register actions at runtime</li>
+        <li><strong>Access Control:</strong> Built-in permission checking with <code>#[AccessLevel]</code> attributes</li>
+        <li><strong>Model Integration:</strong> Automatic connection to module models</li>
+        <li><strong>Table Management:</strong> Helper methods for building dynamic tables with pagination, sorting, and filtering</li>
+        <li><strong>Action Handling:</strong> Automated handling of table actions (edit, delete, custom actions)</li>
+    </ul>
+
+    <h3 class="mt-3">Public Methods Reference</h3>
+
+    <div class="alert alert-info">
+        <strong>📋 Quick Reference:</strong> This table provides a complete overview of all available methods in AbstractController. Click on a method name to jump to its detailed documentation.
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 25%">Method</th>
+                    <th style="width: 35%">Description</th>
+                    <th style="width: 15%">Returns</th>
+                    <th style="width: 25%">Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Lifecycle & Initialization -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Lifecycle & Initialization</strong></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#construct">__construct()</a></code></td>
+                    <td>Constructor - sets up init hook</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>new MyController()</code></td>
+                </tr>
+                <tr>
+                    <td><code>hookInit()</code></td>
+                    <td>Called after framework initialization</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>// Auto-called by framework</code></td>
+                </tr>
+                <tr>
+                    <td><code>init()</code></td>
+                    <td>Override to load assets and initialize</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>Theme::set('javascript', $url)</code></td>
+                </tr>
+
+                <!-- Routing & Actions -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Routing & Request Handling</strong></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#setHandleRoutes">setHandleRoutes()</a></code></td>
+                    <td>Set routing variables from module</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>$router->setHandleRoutes($module)</code></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#handleRoutes">handleRoutes()</a></code></td>
+                    <td>Main route handler - calls action methods</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>// Auto-called by framework</code></td>
+                </tr>
+                <tr>
+                    <td><code>registerRequestAction()</code></td>
+                    <td>Register actions programmatically without attributes</td>
+                    <td><span class="badge bg-info">bool</span></td>
+                    <td><code>$this->registerRequestAction('sync', 'syncAction')</code></td>
+                </tr>
+                <tr>
+                    <td><code>relatedSearchField()</code></td>
+                    <td>Handle AJAX search for related fields</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>// Auto-called for related fields</code></td>
+                </tr>
+
+                <!-- Access Control -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Access Control</strong></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#access">access()</a></code></td>
+                    <td>Check if user has module access</td>
+                    <td><span class="badge bg-info">bool</span></td>
+                    <td><code>if ($this->access()) { ... }</code></td>
+                </tr>
+
+                <!-- Data & Models -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Data & Models</strong></td>
+                </tr>
+                <tr>
+                    <td><code>getAdditionalModels()</code></td>
+                    <td>Get additional models registered</td>
+                    <td><span class="badge bg-warning">array|object|null</span></td>
+                    <td><code>$this->getAdditionalModels('users')</code></td>
+                </tr>
+                <tr>
+                    <td><code>getCommonData()</code></td>
+                    <td>Get common module data (page, title)</td>
+                    <td><span class="badge bg-warning">array</span></td>
+                    <td><code>$data = $this->getCommonData()</code></td>
+                </tr>
+
+                <!-- Table Management (Deprecated - Use TableBuilder) -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Table Management (Deprecated - Use TableBuilder)</strong></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#defaultRequestParams">defaultRequestParams()</a></code></td>
+                    <td>Get default table request parameters</td>
+                    <td><span class="badge bg-warning">array</span></td>
+                    <td><code>$defaults = $this->defaultRequestParams()</code></td>
+                </tr>
+                <tr>
+                    <td><code><a href="#getRequestParams">getRequestParams()</a></code></td>
+                    <td>Get and sanitize table request params</td>
+                    <td><span class="badge bg-warning">array</span></td>
+                    <td><code>$params = $this->getRequestParams($id)</code></td>
+                </tr>
+             
+                <tr>
+                    <td><code><a href="#callTableAction">callTableAction()</a></code></td>
+                    <td>Handle table actions with token verification</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>$this->callTableAction($id, $actions)</code></td>
+                </tr>
+
+                <!-- Action Methods -->
+                <tr class="table-secondary">
+                    <td colspan="4"><strong>Default Action Methods</strong></td>
+                </tr>
+                <tr>
+                    <td><code>actionHome()</code></td>
+                    <td>Default home page action</td>
+                    <td><span class="badge bg-secondary">void</span></td>
+                    <td><code>// Override in child class</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <h5 class="mt-3">Building a dynamic table</h5>
+
+    <p>To build a table, create a method with the <code>#[RequestAction]</code> attribute and use the TableBuilder for simplified table creation.</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">use Builders\TableBuilder;
+
+#[RequestAction('home')]
+protected function list() {
+    $table_id = 'table_posts';
+
+    // Create table with fluent interface
+    $response = TableBuilder::create($this->model, $table_id)
+        ->setDefaultActions()                              // Add Edit/Delete actions
+        ->asLink('title', '?page=posts&action=edit&id=%id%') // Make title clickable
+        ->limit(15)                                        // Set pagination limit
+        ->orderBy('created_at', 'desc')                    // Default sorting
+        ->getResponse();
+
+    Response::render(__DIR__ . '/Views/list_page.php', $response);
+}
+    </code></pre>
+
+    <h5 class="mt-3">Advanced TableBuilder Example</h5>
+
+    <p>For more complex tables with custom columns, filters, and styling:</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">#[RequestAction('home')]
+protected function list() {
+    $table_id = 'table_posts';
+
+    $response = TableBuilder::create($this->model, $table_id)
+        // Query customization
+        ->where('status != ?', ['deleted'])
+        ->orderBy('title', 'asc')
+        ->limit(20)
+
+        // Column customization
+        ->asLink('title', '?page=posts&action=edit&id=%id%')
+        ->setLabel('created_at', 'Published Date')
+        ->setType('status', 'select')
+        ->setOptions('status', ['draft' => 'Draft', 'published' => 'Published'])
+        ->hideColumn('updated_at')
+
+        // Add custom column with processing function
+        ->column('actions_custom', 'Quick Actions', 'html', [], function($row, $key) {
+            return '<a href="?page=posts&action=view&id=' . $row->id . '" class="btn btn-sm btn-outline-primary">View</a>';
+        })
+
+        // Filters
+        ->filterEquals('status', 'status')
+        ->filterLike('search', 'title')
+
+        // Actions
+        ->setDefaultActions([
+            'duplicate' => [
+                'label' => 'Duplicate',
+                'action' => [$this, 'duplicatePost'],
+                'confirm' => 'Duplicate this post?'
+            ]
+        ])
+
+        // Styling
+        ->tableColor('striped-primary')
+        ->headerColor('primary')
+
+        ->getResponse();
+
+    Response::render(__DIR__ . '/Views/list_page.php', $response);
+}
+
+public function duplicatePost($ids, $request) {
+    foreach ($ids as $id) {
+        $post = $this->model->getById($id);
+        if ($post) {
+            $post->title = $post->title . ' (Copy)';
+            $post->status = 'draft';
+            unset($post->id);
+            $this->model->store((array)$post);
+        }
+    }
+    return true;
+}
+    </code></pre>
+
+    <h5 class="mt-3">TableBuilder Benefits</h5>
+
+    <p>The TableBuilder provides several advantages over manual table creation:</p>
+
+    <ul>
+        <li><strong>Fluent Interface:</strong> Chain methods for readable, maintainable code</li>
+        <li><strong>Automatic AJAX Support:</strong> Handles JSON responses automatically</li>
+        <li><strong>Built-in Actions:</strong> Easy setup for edit, delete, and custom actions</li>
+        <li><strong>Advanced Filtering:</strong> Simple filter setup with built-in search</li>
+        <li><strong>Styling System:</strong> Bootstrap-compatible color and class management</li>
+        <li><strong>Column Management:</strong> Hide, reorder, and customize columns easily</li>
+    </ul>
+
+    <h4 class="mt-3">Adding js or css </h4>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">protected function init() {
+        Theme::set('javascript', Route::url().'/Modules/base-module/assets/base-module.js');
+    }</code></pre>
+
+    <h4 class="mt-3">Adding footer and header graphics</h4>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">     $modellist_data['page_info']['footer'] = true;
+        $modellist_data['table_attrs'] = ['tfoot' => ['class' => 'table-footer-gray'], 'tfoot.td.title' => ['class' => 'text-end']];
+        $modellist_data['rows'][] = (object)['title' => 'Footer'];
+        // modify the graphics of the head
+        $modellist_data['table_attrs'] = ['thead' => ['class' => 'table-header-yellow'], 'th.title' => ['class' => 'th-title']];</code></pre>
+
+    <h4 class="mt-3">Adding a link for an action</h4>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">     $modellist_data['row_info']['action'] = ['type' => 'action', 'label' => 'Action', 'options' => [$table_id.'-view' => 'View']];</code></pre>
+    <p>Now you need to add the javascript to handle the action.</p>
+    <p>Here's an ajax example to show an offcanvas with record details.</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-javascript">registerHook('table-action-{$table_id-view}', function (id, sendform) {
+        window.offcanvasEnd.show()
+    window.offcanvasEnd.loading_show()
+    fetch(milk_url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        body: getFormData('?id=' + id + '&action=single_view&page=dynamic_table_example')
+    }).then((response) => {
+        window.offcanvasEnd.loading_hide()
+        return response.json()
+    }).then((data) => {
+        window.offcanvasEnd.body(data.html)
+        window.offcanvasEnd.title(data.title)
+    })
+    // does not update the table
+    return false;
+})</code></pre>
+    <p>Or an example of a link to go to the detail page. In the javascript insert:</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-js">registerHook('table-action-{$table_id-view}', function (id, sendform) {
+        window.location.href = milk_url + '?page=basemodule&action=single_view&id=' + id + '';
+    return false;
+})</code></pre>
+    <p>In the router insert:</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">#[RequestAction('single_view')]
+public function singleView() {
+    Response::themePage('default', __DIR__ . '/Views/edit.page.php',  ['id' => _absint($_REQUEST['id'] ?? 0)]);
+}</code></pre>
+    <p>Create the <code>edit.page.php</code> file in the module's views folder.</p>
+
+    <h4 class="mt-3">Removing checkboxes</h4>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">unset($modellist_data['info']['checkbox']);</code></pre>
+
+    <h4 class="mt-3">Adding free text search</h4>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-html"><?php echo htmlspecialchars('<div class="my-4 row">
+    <div class="col">
+        <input class="form-control ms-2 d-inline-block" type="search" placeholder="Search" aria-label="Search" spellcheck="false" data-ms-editor="true" id="table_id_search" style="width:200px">
+        <span class="btn btn-outline-primary" onClick="tableIdSearch()">Search</span>
+    </div>
+</div>
+'); ?>
+</code></pre>
+    <p>The javascript for search:</p>
+    <pre class="pre-scroll table border p-2 text-bg-gray"><code class="language-javascript">function tableIdSearch() {
+    var comp_table = getComponent('table_id');
+    if (comp_table == null) return;
+    let val =  document.getElementById('table_id_search').value;
+    comp_table.filter_remove_start('search:');
+    if (val != '') {
+        comp_table.filter_add('search:' + val);
+    }
+    comp_table.setPage(1);
+    comp_table.reload();
+}</code></pre>
+   
+<p>The code in this case is already preconfigured to search in all columns, but assuming we want to search in a single column inside the model we should write a <code>filter_{filter_name}</code> function</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">public function filterSearch($search) {
+        $query = $this->getCurrentQuery();
+        $query->where('`title` LIKE ? ', ['%'.$search.'%']);
+    }</code></pre>
+
+<p>It is possible not to use a filter_{filter_name} function, but to set a custom function using the <code>add_filter</code> function</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php"> $this->addFilter('search', [$this, 'filtersearch']);</code></pre>
+
+<h1>AbstractController Abstract Class Documentation</h1>
+<p>The <code>AbstractController</code> class is the base class for managing module routing in Ito. This class handles module actions and provides methods for managing queries and data. This document describes in detail all public methods and their specifications.</p>
+
+<h2 class="mt-4">Main Properties</h2>
+<ul>
+    <li><code>$page</code>: (string) The module name.</li>
+    <li><code>$access</code>: (string) The module access level (<code>public</code>, <code>registered</code>, <code>authorized</code>, <code>admin</code>).</li>
+    <li><code>$title</code>: (string) The module title.</li>
+    <li><code>$model</code>: (string|object) The name or instance of the associated model class.</li>
+
+</ul>
+
+<h2 class="mt-4">Public Methods</h2>
+
+<h3 class="mt-3"><code>__construct()</code></h3>
+<p>Class constructor. Registers the init hook</p>
+   <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+// Usage example in a child class:
+class PostsController extends \App\Abstract\AbstractController {
+    public function init() {
+        Theme::set('javascript', Route::url().'/Modules/posts/assets/posts.js');
+    }
+}
+new PostsController();
+</code></pre>
+            <ul>
+               <li><strong>Input parameters:</strong>
+                    <ul>
+                         <li><em>None</em></li>
+                    </ul>
+               </li>
+                 <li><strong>Return value:</strong>
+                     <ul>
+                       <li><em>None</em></li>
+                  </ul>
+              </li>
+            </ul>
+            
+             <h3 class="mt-3"><code>init()</code></h3>
+            <p>Function to override for loading functions, javascript, css or initializing anything.</p>
+           <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * This method must be overridden to initialize the router.
+ * This method is called by the 'init' hook.
+ * @return void
+ */
+public function init();
+
+// Usage example in a child class:
+class PostsController extends \App\Abstract\AbstractController {
+    public function init() {
+        Theme::set('javascript', Route::url().'/Modules/Posts/Assets/posts.js');
+        Theme::set('styles', Route::url().'/Modules/Posts/Assets/posts.css');
+    }
+}
+</code></pre>
+            <ul>
+                 <li><strong>Input parameters:</strong>
+                      <ul>
+                          <li><em>None</em></li>
+                      </ul>
+                </li>
+                <li><strong>Return value:</strong>
+                      <ul>
+                        <li><code>void</code>: This method does not return any value.</li>
+                     </ul>
+                </li>
+            </ul>
+
+            <h3 class="mt-3"><code>setHandleRoutes($module)</code></h3>
+            <p>Sets the variables for handling page routing, and creates the route that points to the handle_routes method</p>
+            <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @param object $module The module object
+ * @return void
+ */
+public function setHandleRoutes($module);
+
+// Example in the module class is called:
+$this->router->setHandleRoutes($this);
+</code></pre>
+            <ul>
+                <li><strong>Input parameters:</strong>
+                  <ul>
+                      <li><code>$module</code>: (object) The module object.</li>
+                    </ul>
+                 </li>
+                  <li><strong>Return value:</strong>
+                       <ul>
+                        <li><code>void</code>: This method does not return any value.</li>
+                     </ul>
+                 </li>
+            </ul>
+
+            <h3 class="mt-3"><code>handleRoutes()</code></h3>
+            <p>Handles requests to the page. Based on the action parameter, it calls the specific method with the corresponding #[RequestAction] attribute.</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @return void
+ */
+public function handleRoutes();
+
+// Usage example in the child class:
+class PostsController extends \App\Abstract\AbstractController {
+  public function handleRoutes() {
+        if (!$this->access()) {
+            Route::redirect('?page=deny');
+            return;
+        }
+        Theme::set('header.title', Theme::get('site.title')." - ". $this->title);
+
+        // The parent class automatically handles routing to methods
+        // with #[RequestAction] attributes based on the 'action' parameter
+        parent::handleRoutes();
+  }
+}
+</code></pre>
+                <ul>
+                     <li><strong>Input parameters:</strong>
+                        <ul>
+                             <li><em>None</em></li>
+                        </ul>
+                    </li>
+                     <li><strong>Return value:</strong>
+                          <ul>
+                             <li><code>void</code>: This method does not return any value.</li>
+                         </ul>
+                     </li>
+                 </ul>
+
+            <h3 class="mt-3"><code>registerRequestAction($action, $handler, $accessLevel = null)</code></h3>
+            <p>Registers request actions at runtime without using <code>#[RequestAction]</code> attributes.</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">/**
+ * @param string $action Route action (example: "home", "edit", "sync-data")
+ * @param string|array $handler Method name or callable [object, method]
+ * @param string|null $accessLevel Optional access level
+ * @return bool True when registered, false when already registered
+ */
+public function registerRequestAction(string $action, string|array $handler, ?string $accessLevel = null): bool;
+
+// Usage in Controller
+$this->registerRequestAction('sync', 'syncAction');
+$this->registerRequestAction('admin-sync', 'syncAction', 'admin');
+
+// Usage in Controller extension
+$module = $this->module->get();
+if ($module) {
+    $module->registerRequestAction('ext-sync', [$this, 'extSync']);
+}
+</code></pre>
+                <ul>
+                     <li><strong>Input parameters:</strong>
+                        <ul>
+                             <li><code>$action</code>: (string) URL action key.</li>
+                             <li><code>$handler</code>: (string|array) Method name or callable pair <code>[object, method]</code>.</li>
+                             <li><code>$accessLevel</code>: (string|null) Optional method-level access override.</li>
+                        </ul>
+                    </li>
+                 <li><strong>Return value:</strong>
+                      <ul>
+                             <li><code>bool</code>: <code>true</code> if the action was registered, <code>false</code> if it was already registered.</li>
+                         </ul>
+                     </li>
+                 </ul>
+                <p class="text-muted">
+                    Registration also returns <code>false</code> if the target class already declares the same action via <code>#[RequestAction]</code>.
+                </p>
+
+            <h3 class="mt-3">Action Methods with Attributes</h3>
+            <p>Methods with <code>#[RequestAction]</code> attributes handle specific URL actions. The method with <code>#[RequestAction('home')]</code> is called when no action parameter is passed.</p>
+ <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+use App\Attributes\RequestAction;
+
+// Usage example in a child class:
+class PostsController extends \App\Abstract\AbstractController {
+    #[RequestAction('home')]
+    protected function home() {
+        Response::themePage('default', '<h1>'.$this->title.'</h1>');
+    }
+
+    #[RequestAction('edit')]
+    protected function edit() {
+        $id = _absint($_REQUEST['id'] ?? 0);
+        Response::themePage('default', '<h1>Edit Post ' . $id . '</h1>');
+    }
+}
+</code></pre>
+           <ul>
+                <li><strong>Input parameters:</strong>
+                     <ul>
+                       <li><em>None</em></li>
+                    </ul>
+               </li>
+                <li><strong>Return value:</strong>
+                   <ul>
+                       <li><code>void</code>: This method does not return any value.</li>
+                    </ul>
+              </li>
+           </ul>
+
+            <h3 class="mt-3"><code>access()</code></h3>
+             <p>Checks if the user has permissions to access the module based on the <code>$access</code> property</p>
+             <p>You can override this method in your controller when you need action-level custom logic. By default it delegates to <code>$this->module->access()</code>.</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @return bool
+ */
+protected function access(): bool;
+
+// Optional override in your controller
+protected function access(): bool
+{
+    return $this->module->access() && Permissions::check('projects.access');
+}
+
+// Usage example in the child class
+if ($this->access()) {
+    // the user has permissions to access
+} else {
+   Route::redirect('?page=deny');
+}
+</code></pre>
+                <ul>
+                    <li><strong>Input parameters:</strong>
+                       <ul>
+                           <li><em>None</em></li>
+                         </ul>
+                   </li>
+                     <li><strong>Return value:</strong>
+                        <ul>
+                             <li><code>bool</code>: Returns <code>true</code> if the user has permissions, <code>false</code> otherwise.</li>
+                        </ul>
+                   </li>
+                </ul>
+
+               <h3 class="mt-3"><code>defaultRequestParams()</code></h3>
+                <p>Returns the default parameters for a table request.</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @return array
+ */
+protected function defaultRequestParams(): array;
+
+// Usage example in a child class
+protected function getRequestParams($table_id) {
+     $default = $this->defaultRequestParams();
+    return $default;
+}
+</code></pre>
+                 <ul>
+                     <li><strong>Input parameters:</strong>
+                         <ul>
+                           <li><em>None</em></li>
+                         </ul>
+                     </li>
+                    <li><strong>Return value:</strong>
+                        <ul>
+                           <li><code>array</code>: An associative array with default parameters (order_field, order_dir and limit).</li>
+                       </ul>
+                     </li>
+                </ul>
+
+            <h3 class="mt-3"><code>getRequestParams($table_id)</code></h3>
+            <p>Retrieves and sanitizes table parameters from the request, also adds default parameters</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @param string $table_id The table id
+ * @return array Returns the sanitized parameters
+ */
+protected function getRequestParams($table_id): array;
+
+// Usage example in a child class
+#[RequestAction('home')]
+protected function home() {
+     $table_id = 'table_posts';
+     $request = $this->getRequestParams($table_id);
+    //...
+}
+</code></pre>
+              <ul>
+                   <li><strong>Input parameters:</strong>
+                        <ul>
+                           <li><code>$table_id</code>: (string) The unique table identifier.</li>
+                        </ul>
+                   </li>
+                    <li><strong>Return value:</strong>
+                        <ul>
+                             <li><code>array</code>: An associative array containing the table request parameters (<code>order_field</code>, <code>order_dir</code>, <code>limit</code>, <code>page</code>).</li>
+                        </ul>
+                   </li>
+                </ul>
+
+            <h3 class="mt-3"><code>getModellistData($table_id, $fn_filter_applier, $fn_query_applier)</code></h3>
+                <p>Retrieves the data and structure of the table for display. You can see an example of how to use it in <a href="<?php echo Route::url('?page=docs&action=Framework/DynamicTable/modellist-table-p2'); ?>">Dynamic Table > Add query filters</a></p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @param string $table_id The table id
+ * @param callable $fn_filter_applier A callback function to apply filters to the modellist
+ * @param callable $fn_query_applier A callback function to modify the query
+ * @return array
+ */
+protected function getModellistData($table_id, $fn_filter_applier, $fn_query_applier): array;
+
+// Usage example in a child class
+#[RequestAction('home')]
+protected function home() {
+    $table_id = 'table_posts';
+    $modellist_data = $this->getModellistData($table_id, $fn_filter_applier, $fn_query_applier);
+    $outputType = Response::isJson() ? 'json' : 'html';
+             
+    $table_html = Get::themePlugin('table', $modellist_data); 
+    $theme_path = realpath(__DIR__.'/Views/list.page.php');
+
+    if ($outputType === 'json') {
+        Response::json([
+            'html' => $table_html,
+            'success' => !MessagesHandler::hasErrors(),
+            'msg' => MessagesHandler::errorsToString()
+        ]);
+    } else {
+        Response::themePage('default',  $theme_path, [
+            'table_html' => $table_html,
+            'table_id' => $table_id,
+            'page' => $this->page
+        ]);
+    }
+}
+</code></pre>
+                <ul>
+                     <li><strong>Input parameters:</strong>
+                        <ul>
+                           <li><code>$table_id</code>: (string) The unique table identifier.</li>
+                           <li><code>$fn_filter_applier</code>: (callable) A callback function to apply filters to the modellist.</li>
+                           <li><code>$fn_query_applier</code>: (callable) A callback function to modify the query.</li>
+                         </ul>
+                     </li>
+                     <li><strong>Return value:</strong>
+                         <ul>
+                             <li><code>array</code>: Array containing the data to display (<code>rows</code>, <code>info</code>, <code>page_info</code>).</li>
+                        </ul>
+                   </li>
+                </ul>
+    
+                <h3 class="mt-3"><code>callTableAction($table_id, $actions)</code></h3>
+            <p>Handles table group actions, such as deleting multiple records simultaneously</p>
+<pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">
+/**
+ * @param string $table_id The table id
+ * @param array $actions ['request_action' => 'handlerMethodName']
+ * @return void
+ */
+protected function callTableAction(string $table_id, array $actions): void;
+
+// Usage example in a child class
+#[RequestAction('home')]
+protected function home() {
+     $table_id = 'table_posts';
+    $request = $this->getRequestParams($table_id);
+    $this->callTableAction($table_id, [
+        'delete' => 'tableActionDelete',
+        'archive' => 'tableActionArchive',
+    ]);
+    // ...
+}
+
+// Method to call dynamically
+protected function tableActionDelete(array $ids, array $request): void {
+    foreach ($ids as $id) {
+        $this->model->delete((int) $id);
+    }
+}
+</code></pre>
+        <ul>
+            <li><strong>Input parameters:</strong>
+                <ul>
+                    <li><code>$table_id</code>: (string) The table identifier.</li>
+                    <li><code>$actions</code>: (array) Map of request actions to handler methods (example: <code>['delete' =&gt; 'tableActionDelete']</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Return value:</strong>
+                <ul>
+                    <li><code>void</code>: This method does not return any value.</li>
+                </ul>
+            </li>
+        </ul>
+
+    <h2 class="mt-4">Dynamic Calls</h2>
+    <p>The following methods make dynamic calls to functions defined in the child class:</p>
+    <ul>
+        <li><code>handleRoutes()</code>: Calls the method with the corresponding #[RequestAction] attribute for the requested action.</li>
+        <li><code>callTableAction()</code>: Dynamically calls the handler mapped in the <code>$actions</code> array.</li>
+    </ul>
+</div>

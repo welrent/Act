@@ -1,0 +1,22 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Environment variables must be set in Netlify Dashboard → Site Settings → Environment Variables:
+# TURSO_DATABASE_URL
+# TURSO_AUTH_TOKEN
+# NEXT_PUBLIC_FIREBASE_API_KEY
+# NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+# NEXT_PUBLIC_FIREBASE_PROJECT_ID
+# NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+# NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+# NEXT_PUBLIC_FIREBASE_APP_ID
+# NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+# FIREBASE_ADMIN_CREDENTIALS   (optional, for full Admin SDK - paste the JSON from Firebase Console)

@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Don't rewrite admin, api, or storage directories
+    RewriteCond %{REQUEST_URI} ^/(admin|api|storage) [NC]
+    RewriteRule ^ - [L]
+
+    # Don't rewrite files or directories that exist.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?file=$1 [QSA,L]
+</IfModule>

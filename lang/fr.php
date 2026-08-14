@@ -1,0 +1,20 @@
+<?php
+return [
+    'back_to_home' => 'Retour à l\'accueil',
+    'not_logged_in' => 'Vous n\'êtes pas connecté',
+    'search_placeholder' => 'Recherche...',
+    'search_shortcut' => 'K',
+    'terms_of_use' => 'Conditions d\'utilisation',
+    'terms_desc' => 'Consultez les règles et directives d\'utilisation de la plateforme.',
+    'accessibility' => 'Déclaration d\'accessibilité',
+    'accessibility_desc' => 'Notre engagement continu envers l\'accessibilité numérique.',
+    'privacy' => 'Déclaration de confidentialité',
+    'privacy_desc' => 'Informations sur la collecte, l\'utilisation et la protection de vos données.',
+    'cookie' => 'Déclaration sur les cookies',
+    'cookie_desc' => 'Détails concernant notre utilisation des cookies et technologies de suivi.',
+    'car_rental' => 'Contrat de location de voiture',
+    'boat_rental' => 'Contrat de location de bateau',
+    'equip_rental' => 'Contrat de location d\'équipement',
+    'welcome_msg' => 'Bienvenue',
+    'welcome_bio' => 'Gérez tous vos contrats de location rapidement et en toute simplicité.',
+];

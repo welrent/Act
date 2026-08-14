@@ -1,0 +1,556 @@
+<?php
+namespace Modules\Docs\Pages;
+
+/**
+ * @title Field Configuration
+ * @guide developer
+ * @order 41
+ * @tags FormBuilder, fields, field-configuration, form-fields, resetFields, calcExpr, defaultExpr, validateExpr, requireIf
+ */
+!defined('MILK_DIR') && die(); // Avoid direct access
+?>
+<div class="bg-white p-4">
+    <h1>FormBuilder - Field Configuration</h1>
+
+    <p>Form field configuration starts from the Model definition. FormBuilder methods allow you to modify this base configuration to customize the fields.</p>
+
+    <h2>Important: Field-First Context</h2>
+
+    <p>
+        Most methods in this page are <strong>field-first</strong>: they work on the <strong>current field</strong>.
+        The current field is set by calling <code>field('FIELD_NAME')</code>.
+    </p>
+    <p>
+        After <code>field('FIELD_NAME')</code>, every chained method (e.g. <code>label()</code>, <code>required()</code>, <code>calcExpr()</code>, <code>validateExpr()</code>, <code>requireIf()</code>) applies to that field until you call <code>field()</code> again.
+    </p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// ✅ Correct: set current field first
+->field('EMAIL')
+    ->label('Email Address')
+    ->required()
+
+// ✅ Switch context to another field
+->field('STATUS')
+    ->formType('select')
+    ->options(['active' => 'Active', 'inactive' => 'Inactive'])
+
+// ❌ Wrong: no current field selected first
+->label('Email Address')</code></pre>
+
+    <div class="alert alert-warning">
+        <strong>Note:</strong> if a field-first method is called without <code>field()</code>, FormBuilder cannot know which field to modify.
+    </div>
+
+    <p>Methods that are <strong>not</strong> field-first and can be used directly on the builder include: <code>addField()</code>, <code>modifyField()</code>, <code>removeField()</code>, <code>fieldOrder()</code>, and <code>resetFields()</code>.</p>
+
+    <h2>Available Methods</h2>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 30%">Method</th>
+                <th style="width: 40%">Description</th>
+                <th style="width: 30%">Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>field(string $key)</code></td>
+                <td>Selects an existing field or creates it if it doesn't exist</td>
+                <td><code>->field('email')</code></td>
+            </tr>
+            <tr>
+                <td><code>type(string $type)</code></td>
+                <td>Sets the data type (string, int, date, etc.)</td>
+                <td><code>->type('string')</code></td>
+            </tr>
+            <tr>
+                <td><code>formType(string $type)</code></td>
+                <td>Sets the form field type (text, select, textarea, etc.)</td>
+                <td><code>->formType('select')</code></td>
+            </tr>
+            <tr>
+                <td><code>label(string $label)</code></td>
+                <td>Sets the field label</td>
+                <td><code>->label('Email')</code></td>
+            </tr>
+            <tr>
+                <td><code>options(array $options)</code></td>
+                <td>Sets options for select/checkbox/radio</td>
+                <td><code>->options(['1' => 'Yes'])</code></td>
+            </tr>
+            <tr>
+                <td><code>required(bool $req = true)</code></td>
+                <td>Makes the field required</td>
+                <td><code>->required()</code></td>
+            </tr>
+            <tr>
+                <td><code>helpText(string $text)</code></td>
+                <td>Sets the help text below the field</td>
+                <td><code>->helpText('Format: xxx-xxxx')</code></td>
+            </tr>
+            <tr>
+                <td><code>value(mixed $value)</code></td>
+                <td>Sets the field value</td>
+                <td><code>->value('default')</code></td>
+            </tr>
+            <tr>
+                <td><code>default(mixed $value)</code></td>
+                <td>Sets the default value if no value exists</td>
+                <td><code>->default('IT')</code></td>
+            </tr>
+            <tr>
+                <td><code>checkboxValues($checked, $unchecked)</code></td>
+                <td>Sets custom values for checkbox (e.g., 'S'/'N', 'Y'/'N')</td>
+                <td><code>->checkboxValues('S', 'N')</code></td>
+            </tr>
+            <tr>
+                <td><code>disabled(bool $dis = true)</code></td>
+                <td>Disables the field</td>
+                <td><code>->disabled()</code></td>
+            </tr>
+            <tr>
+                <td><code>readonly(bool $ro = true)</code></td>
+                <td>Makes the field readonly</td>
+                <td><code>->readonly()</code></td>
+            </tr>
+            <tr>
+                <td><code>class(string $class)</code></td>
+                <td>Sets the CSS class</td>
+                <td><code>->class('form-control-lg')</code></td>
+            </tr>
+            <tr>
+                <td><code>errorMessage(string $msg)</code></td>
+                <td>Sets a custom error message</td>
+                <td><code>->errorMessage('Invalid email')</code></td>
+            </tr>
+            <tr>
+                <td><code>calcExpr(string $expression)</code></td>
+                <td>Sets a calculated expression for the field value (MilkForm expression)</td>
+                <td><code>->calcExpr('[QTY] * [PRICE]')</code></td>
+            </tr>
+            <tr>
+                <td><code>defaultExpr(string $expression)</code></td>
+                <td>Sets a soft default value expression (applied only in JS when field is empty)</td>
+                <td><code>->defaultExpr('[PRICE] * 0.22')</code></td>
+            </tr>
+            <tr>
+                <td><code>validateExpr(string $expression, ?string $message = null)</code></td>
+                <td>Sets an expression that must evaluate to true for field validity</td>
+                <td><code>->validateExpr('[END] &gt;= [START]', 'Invalid range')</code></td>
+            </tr>
+            <tr>
+                <td><code>requireIf(string $expression, ?string $message = null)</code></td>
+                <td>Makes the field required only when the expression is true</td>
+                <td><code>->requireIf('[TYPE] == "company"')</code></td>
+            </tr>
+            <tr>
+                <td><code>moveBefore(string $field)</code></td>
+                <td>Moves the field before another field</td>
+                <td><code>->moveBefore('status')</code></td>
+            </tr>
+            <tr>
+                <td><code>resetFields()</code></td>
+                <td>Hides all existing fields from Model. Fields become visible when you call <code>field()</code> with their base configuration</td>
+                <td><code>->resetFields()</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Basic Usage</h2>
+
+    <p>Methods are chained after <code>field()</code> which selects the field to configure:</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">$form = FormBuilder::create($model, $this->page)
+    ->field('email')
+        ->label('Email Address')
+        ->required()
+        ->errorMessage('Please enter a valid email')
+        ->helpText('We will never share your email with anyone else')
+    ->field('status')
+        ->formType('select')
+        ->options(['active' => 'Active', 'inactive' => 'Inactive'])
+        ->value('active')
+    ->getForm();
+</code></pre>
+
+    <h2>Expression-Based Field Logic</h2>
+
+    <p>FormBuilder supports reactive expressions directly on fields. These expressions are executed by MilkForm in JavaScript.</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">$form = FormBuilder::create($model, $this->page)
+    ->field('TOTAL')
+        ->readonly()
+        ->calcExpr('[PRICE] * [QTY]')
+
+    ->field('DISCOUNT')
+        ->defaultExpr('[TOTAL] * 0.10')
+
+    ->field('END_DATE')
+        ->validateExpr('[END_DATE] >= [START_DATE]', 'End date must be after start date')
+
+    ->field('VAT_NUMBER')
+        ->requireIf('[COUNTRY] == "IT" AND [IS_COMPANY] == 1', 'VAT number is required for Italian companies')
+    ->getForm();
+</code></pre>
+
+    <div class="alert alert-info">
+        <strong>Note:</strong> <code>validateExpr()</code>, <code>requireIf()</code>, <code>calcExpr()</code>, and <code>defaultExpr()</code> in FormBuilder are client-side (JS) features. For guaranteed save-time validation, define expression rules in the Model too.
+    </div>
+
+    <h2>Creating New Fields</h2>
+
+    <p>If the field doesn't exist in the Model, it will be created automatically:</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('phone')
+    ->type('string')
+    ->label('Phone Number')
+    ->required()
+    ->helpText('Format: 555-1234')
+</code></pre>
+
+    <h2>Modifying Existing Fields</h2>
+
+    <p>Fields defined in the Model can be modified:</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// 'email' field defined in the Model
+->field('email')
+    ->label('Email Address')  // Modifies the label
+    ->helpText('We will never share your email')  // Adds help text
+    ->required()  // Makes it required
+</code></pre>
+
+    <h2>Examples by Field Type</h2>
+
+    <h3>Text Field</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('username')
+    ->type('string')
+    ->label('Username')
+    ->required()
+    ->errorMessage('Username is required')
+    ->helpText('Choose a unique username')
+</code></pre>
+
+    <h3>Select Field</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('category')
+    ->formType('select')
+    ->label('Category')
+    ->options([
+        '1' => 'Electronics',
+        '2' => 'Books',
+        '3' => 'Clothing'
+    ])
+    ->value('1')
+    ->required()
+</code></pre>
+
+    <h3>Textarea Field</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('description')
+    ->formType('textarea')
+    ->label('Description')
+    ->helpText('Provide a detailed description')
+</code></pre>
+
+    <h3>Date Field</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('publish_date')
+    ->type('date')
+    ->label('Publish Date')
+    ->value(date('Y-m-d'))
+</code></pre>
+
+    <h3>Checkbox with Custom Values</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('active')
+    ->formType('checkbox')
+    ->label('Active')
+    ->checkboxValues('S', 'N')  // 'S' when checked, 'N' when unchecked
+</code></pre>
+
+    <h3>Switch Field</h3>
+    <p>A switch is a checkbox with Bootstrap's <code>form-switch</code> class. Use <code>checkboxValues()</code> for custom values and <code>formParams(['form-check-class' => 'form-switch'])</code> to enable the switch style:</p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// In your Model
+->string('active', 1)
+    ->label('Active')
+    ->formType('checkbox')
+    ->checkboxValues('S', 'N')  // 'S' = On, 'N' = Off
+    ->formParams(['form-check-class' => 'form-switch'])
+
+// Or with FormBuilder
+->field('notifications')
+    ->formType('checkbox')
+    ->label('Enable Notifications')
+    ->checkboxValues('Y', 'N')
+    ->formParams(['form-check-class' => 'form-switch'])
+</code></pre>
+
+    <h3>Disabled Field</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('created_at')
+    ->label('Created At')
+    ->readonly()
+</code></pre>
+
+    <h3>Field with Set Value</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('post_id')
+    ->type('int')
+    ->value($post_id)
+    ->readonly()
+</code></pre>
+
+    <h2>Reset and Rebuild Fields</h2>
+
+    <p>Use <code>resetFields()</code> to start with a clean slate and show only the fields you explicitly define. This is useful when you want to create a form with a specific subset of fields from your Model.</p>
+
+    <div class="alert alert-info">
+        <h5><i class="bi bi-lightbulb"></i> How resetFields() Works</h5>
+        <p class="mb-2">When you call <code>resetFields()</code>, all existing fields from the Model are hidden. Then, as you call <code>field()</code>, those fields become visible again <strong>with their base configuration from the Model</strong>.</p>
+        <p class="mb-0"><strong>Key difference from TableBuilder:</strong> In FormBuilder, when you reactivate a field with <code>field()</code>, it automatically retains its base configuration from the Model (e.g., if it was defined as a checkbox in the Model, it will be a checkbox).</p>
+    </div>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">$form = FormBuilder::create($model, $this->page)
+    ->resetFields()  // Hide ALL existing fields from Model
+
+    // Only these fields will be shown, with their Model configuration:
+    ->field('id')
+        ->label('ID')
+        ->readonly()
+
+    ->field('title')
+        ->label('Article Title')
+        ->required()
+
+    ->field('status')
+        ->label('Status')
+        // If 'status' is a checkbox in the Model, it remains a checkbox
+
+    ->field('published_at')
+        ->label('Published Date')
+
+    ->addStandardActions()
+    ->getForm();
+
+// Result: Form shows only id, title, status, published_at (in that order)
+// All other Model fields are hidden
+// Each field maintains its base configuration from the Model</code></pre>
+
+    <div class="alert alert-success">
+        <h5><i class="bi bi-check-circle"></i> Use Cases for resetFields()</h5>
+        <ul class="mb-0">
+            <li><strong>Simplified forms:</strong> Show only essential fields for quick edits</li>
+            <li><strong>Multi-step forms:</strong> Display different field sets for each step</li>
+            <li><strong>Role-based forms:</strong> Show different fields based on user permissions</li>
+            <li><strong>Custom field order:</strong> Define the exact order of fields without using <code>moveBefore()</code></li>
+        </ul>
+    </div>
+
+    <h2>Field Repositioning</h2>
+
+    <p>The <code>moveBefore()</code> method moves the field before another field:</p>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->field('email')
+    ->label('Email')
+    ->moveBefore('password')  // Email will appear before password
+
+->field('phone')
+    ->type('string')
+    ->label('Phone')
+    ->moveBefore('address')  // Phone will appear before address
+</code></pre>
+
+    <h2>Complete Example</h2>
+
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">namespace Modules\Posts;
+
+use App\Abstracts\AbstractController;
+use App\{Response, Route};
+use Builders\FormBuilder;
+
+class PostsController extends AbstractController
+{
+    public function edit() {
+        $response = $this->getCommonData();
+
+        $response['form'] = FormBuilder::create($this->model, $this->page)
+            // Modify existing fields from the Model
+            ->field('title')
+                ->label('Post Title')
+                ->required()
+                ->errorMessage('Title is required')
+                ->helpText('Enter a catchy title for your post')
+
+            ->field('content')
+                ->formType('editor')
+                ->label('Post Content')
+                ->required()
+
+            ->field('status')
+                ->formType('select')
+                ->options([
+                    'draft' => 'Draft',
+                    'published' => 'Published',
+                    'archived' => 'Archived'
+                ])
+                ->value('draft')
+
+            // Create a new field not present in the Model
+            ->field('excerpt')
+                ->type('text')
+                ->formType('textarea')
+                ->label('Excerpt')
+                ->helpText('Brief summary of the post content')
+                ->moveBefore('content')
+
+            ->field('created_at')
+                ->readonly()
+
+            ->addStandardActions()
+            ->getForm();
+
+        $response['title'] = 'Edit Post';
+        Response::render(__DIR__ . '/Views/edit_page.php', $response);
+    }
+}
+</code></pre>
+
+    <h2>Additional Methods</h2>
+
+    <h3>Adding New Fields with addField()</h3>
+
+    <p>The <code>addField()</code> method allows you to add a new field programmatically, specifying all properties in a single options array.</p>
+
+    <p><strong>Syntax:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->addField(string $field_name, string $type, array $options = [], string $position_before = '')
+</code></pre>
+
+    <p><strong>Parameters:</strong></p>
+    <ul>
+        <li><code>$field_name</code>: Name of the field to add</li>
+        <li><code>$type</code>: Data type (string, int, date, datetime, bool, etc.)</li>
+        <li><code>$options</code>: Array with all field configurations (label, form-type, required, options, etc.)</li>
+        <li><code>$position_before</code>: (Optional) Name of the field before which to insert the new field</li>
+    </ul>
+
+    <p><strong>Basic Example:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Adds a simple text field at the end of the form
+->addField('phone', 'string', [
+    'label' => 'Phone Number',
+    'form-type' => 'text',
+    'required' => true,
+    'form-params' => [
+        'help-text' => 'Format: +39 123 456 7890'
+    ]
+])
+</code></pre>
+
+    <p><strong>Example with Positioning:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Adds a select field before the 'status' field
+->addField('priority', 'int', [
+    'label' => 'Priority',
+    'form-type' => 'select',
+    'options' => [
+        1 => 'Low',
+        2 => 'Medium',
+        3 => 'High',
+        4 => 'Critical'
+    ],
+    'default' => 2
+], 'status')
+</code></pre>
+
+    <p><strong>Complete Example with All Options:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->addField('custom_field', 'string', [
+    'label' => 'Custom Field',
+    'form-type' => 'textarea',
+    'required' => true,
+    'default' => '',
+    'form-params' => [
+        'help-text' => 'Enter your custom content here',
+        'class' => 'custom-textarea',
+        'rows' => 5,
+        'readonly' => false,
+        'disabled' => false,
+        'invalid-feedback' => 'This field is required'
+    ]
+], 'content')
+</code></pre>
+
+    <p><strong>Difference between addField() and field():</strong></p>
+    <ul>
+        <li><code>field()</code>: Fluent approach with method chaining. Ideal for step-by-step configurations</li>
+        <li><code>addField()</code>: Complete configuration in a single array. Ideal for adding fields in loops or when you already have all configurations in an array</li>
+    </ul>
+
+    <h3>Modifying Existing Fields with modifyField()</h3>
+
+    <p>The <code>modifyField()</code> method allows you to modify an existing field by merging new options with existing ones, and optionally repositioning it.</p>
+
+    <p><strong>Syntax:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->modifyField(string $field_name, array $options, string $position_before = '')
+</code></pre>
+
+    <p><strong>Parameters:</strong></p>
+    <ul>
+        <li><code>$field_name</code>: Name of the field to modify</li>
+        <li><code>$options</code>: Array with properties to modify or add (will be merged with existing properties)</li>
+        <li><code>$position_before</code>: (Optional) Name of the field before which to move the modified field</li>
+    </ul>
+
+    <p><strong>Basic Example:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Modifies the label and makes an existing field required
+->modifyField('email', [
+    'label' => 'Email Address',
+    'required' => true
+])
+</code></pre>
+
+    <p><strong>Example with Repositioning:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Modifies a field and moves it before 'password'
+->modifyField('email', [
+    'label' => 'User Email',
+    'form-params' => [
+        'help-text' => 'This will be your login username'
+    ]
+], 'password')
+</code></pre>
+
+    <p><strong>Example: Changing a Field from Text to Select:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Transforms the 'status' field into a select with options
+->modifyField('status', [
+    'form-type' => 'select',
+    'options' => [
+        'draft' => 'Draft',
+        'published' => 'Published',
+        'archived' => 'Archived'
+    ]
+])
+</code></pre>
+
+    <p><strong>Example: Adding Help Text and Validation:</strong></p>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">// Adds help text and custom error message
+->modifyField('phone', [
+    'form-params' => [
+        'help-text' => 'Format: +39 123 456 7890',
+        'invalid-feedback' => 'Please enter a valid phone number',
+        'pattern' => '^\+?[0-9\s]+$'
+    ]
+])
+</code></pre>
+
+    <p><strong>Difference between modifyField() and field():</strong></p>
+    <ul>
+        <li><code>field()</code>: Creates the field if it doesn't exist, otherwise modifies it. Fluent approach</li>
+        <li><code>modifyField()</code>: Only modifies existing fields. Allows merging complex arrays and repositioning in a single call</li>
+    </ul>
+
+    <h3>Removing Fields</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->removeField('created_at')
+->removeField('updated_at')
+</code></pre>
+
+    <h3>Field Order</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->fieldOrder(['id', 'title', 'content', 'status'])
+</code></pre>
+
+    <h3>Conditional Visibility</h3>
+    <pre class="pre-scrollable border p-2 text-bg-gray"><code class="language-php">->showIf('publish_date', '[status] == "published"')
+</code></pre>
+
+</div>

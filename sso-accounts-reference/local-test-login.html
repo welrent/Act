@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welrent – Sign In (Local Test)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0a1e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #1a1130;
+            border: 1px solid rgba(142,185,255,0.12);
+            border-radius: 20px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+        .logo-text { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { color: #8EB9FF; }
+
+        h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+        .subtitle { font-size: 14px; color: #8C8C91; margin-bottom: 28px; line-height: 1.5; }
+        .origin-tag {
+            display: inline-block;
+            background: rgba(142,185,255,0.1);
+            color: #8EB9FF;
+            border-radius: 4px;
+            padding: 1px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .field {
+            background: #120d24;
+            border: 1px solid #2a2040;
+            border-radius: 10px;
+            padding: 12px 14px;
+            width: 100%;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .field:focus {
+            border-color: #8EB9FF;
+            box-shadow: 0 0 0 3px rgba(142,185,255,0.15);
+        }
+        .field::placeholder { color: #4a4060; }
+
+        .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b5d8a;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            margin-top: 4px;
+        }
+        .btn-primary { background: #2F214B; color: #fff; }
+        .btn-primary:hover { background: #3e2d63; transform: translateY(-1px); }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .dev-note {
+            margin-top: 20px;
+            padding: 12px 14px;
+            background: rgba(142,185,255,0.06);
+            border: 1px solid rgba(142,185,255,0.12);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #6b5d8a;
+            line-height: 1.6;
+        }
+        .dev-note strong { color: #8EB9FF; }
+
+        .success {
+            text-align: center;
+            padding: 24px 0;
+        }
+        .success svg { margin-bottom: 14px; }
+        .success h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+        .success p  { font-size: 14px; color: #8C8C91; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#2F214B"/>
+            <path d="M8 10h4l4 12 4-12h4" stroke="#8EB9FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="logo-text">Welrent <span>Accounts</span></div>
+    </div>
+
+    <!-- Login form -->
+    <div id="form-view">
+        <h1>Sign in</h1>
+        <p class="subtitle">
+            Signing in to <span class="origin-tag" id="origin-label">act.welrent.com</span>
+        </p>
+
+        <label class="label" for="login-name">Display Name</label>
+        <input id="login-name" class="field" type="text" placeholder="e.g. Mark Plaatsman" autocomplete="name">
+
+        <label class="label" for="login-email">Email Address</label>
+        <input id="login-email" class="field" type="email" placeholder="mark@welrent.com" autocomplete="email">
+
+        <label class="label" for="login-photo">Photo URL <span style="color:#4a4060;font-weight:400;text-transform:none;">(optional)</span></label>
+        <input id="login-photo" class="field" type="url" placeholder="https://..." autocomplete="off">
+
+        <button class="btn btn-primary" onclick="doLogin()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+            Sign In &amp; Continue
+        </button>
+
+        <div class="dev-note">
+            <strong>🛠 Developer Test Mode</strong><br>
+            This page simulates the Welrent SSO login for local dev.<br>
+            It sends a <code>postMessage</code> directly to the opener window — no Firebase needed.
+        </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-view" class="success" style="display:none;">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+            <circle cx="26" cy="26" r="26" fill="rgba(142,185,255,0.1)"/>
+            <path d="M16 26l8 8 12-14" stroke="#8EB9FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Signed in!</h2>
+        <p>Returning you to <strong id="success-origin" style="color:#8EB9FF;"></strong>…</p>
+        <p style="margin-top:8px;font-size:12px;color:#4a4060;">This window will close automatically.</p>
+    </div>
+</div>
+
+<script>
+    // ── Parse return_to from query string ────────────────────────────────────
+    var params    = new URLSearchParams(window.location.search);
+    var returnTo  = params.get('return_to') || '';
+    var targetOrigin = returnTo ? decodeURIComponent(returnTo) : '*';
+
+    // Show origin in UI
+    var label = targetOrigin.replace('https://', '').replace('http://', '') || 'act.welrent.com';
+    document.getElementById('origin-label').textContent = label;
+
+    function doLogin() {
+        var name     = document.getElementById('login-name').value.trim();
+        var email    = document.getElementById('login-email').value.trim();
+        var photoUrl = document.getElementById('login-photo').value.trim();
+
+        if (!name) { document.getElementById('login-name').focus(); return; }
+        if (!email) { document.getElementById('login-email').focus(); return; }
+
+        // Build the SSO payload — same format the SDK expects
+        var payload = {
+            type:        'WELRENT_SSO_TOKEN',
+            token:       'dev_local_token_' + Date.now(), // local dev placeholder
+            uid:         'dev_' + email.replace(/[^a-z0-9]/gi,'_'),
+            displayName: name,
+            email:       email,
+            photoUrl:    photoUrl || '',
+        };
+
+        // Show success UI
+        document.getElementById('form-view').style.display    = 'none';
+        document.getElementById('success-view').style.display = 'block';
+        document.getElementById('success-origin').textContent = label;
+
+        // Send postMessage to the parent window (act.welrent.com / XAMPP)
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(payload, targetOrigin || '*');
+            setTimeout(function () { window.close(); }, 600);
+        } else {
+            // No opener — maybe opened directly
+            document.querySelector('#success-view p').textContent =
+                'No opener window found. Please close this tab manually.';
+        }
+    }
+
+    // Allow Enter key to submit
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') doLogin();
+    });
+</script>
+
+</body>
+</html>
