@@ -1,19 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+
+const CONSENT_KEY = 'welrent_act_cookie_consent';
 
 export default function Footer() {
   const [showGDPR, setShowGDPR] = useState(false);
 
   useEffect(() => {
-    if (typeof document !== 'undefined' && !document.cookie.includes('cookieConsentAct=true')) {
+    try {
+      const local = localStorage.getItem(CONSENT_KEY);
+      const cookieOk = typeof document !== 'undefined' && document.cookie.includes('cookieConsentAct=true');
+      if (!local && !cookieOk) {
+        setShowGDPR(true);
+      }
+    } catch {
       setShowGDPR(true);
     }
   }, []);
 
   const acceptCookies = () => {
-    document.cookie = "cookieConsentAct=true; max-age=31536000; path=/";
+    try {
+      localStorage.setItem(CONSENT_KEY, 'true');
+    } catch {
+      /* ignore */
+    }
+    document.cookie = 'cookieConsentAct=true; max-age=31536000; path=/; SameSite=Lax';
     setShowGDPR(false);
   };
 
@@ -24,19 +36,25 @@ export default function Footer() {
     { code: 'es', name: 'Español', flag: '🇪🇸' },
   ];
 
-  const currentLang = 'en'; // Mock current lang
+  const currentLang = 'en';
 
   return (
     <>
       <div className="design-footer">
         <div className="flex gap-[15px] items-center flex-wrap">
-          <Link href="https://welrent.com" target="_blank" className="text-inherit no-underline">
+          <a
+            href="https://github.com/welrent/wr-frontend"
+            target="_blank"
+            rel="noreferrer"
+            className="text-inherit no-underline"
+          >
             Welrent Europa B.V.
-          </Link>
+          </a>
           <div className="flex gap-[6px] items-center flex-wrap">
             {languages.map((lang) => (
               <button
                 key={lang.code}
+                type="button"
                 title={lang.name}
                 style={{
                   display: 'flex',
@@ -64,8 +82,10 @@ export default function Footer() {
       </div>
 
       {showGDPR && (
-        <div 
-          id="gdpr-cookie-banner" 
+        <div
+          id="gdpr-cookie-banner"
+          role="dialog"
+          aria-label="Cookie consent"
           style={{
             position: 'fixed',
             bottom: 0,
@@ -77,16 +97,17 @@ export default function Footer() {
             zIndex: 9999,
             boxShadow: '0 -10px 30px rgba(0,0,0,0.5)',
             borderTop: '1px solid #8EB9FF',
-            fontFamily: '-apple-system, BlinkMacSystemFont, Arial, sans-serif'
+            fontFamily: '-apple-system, BlinkMacSystemFont, Arial, sans-serif',
           }}
         >
           <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
             <div style={{ flex: 1, minWidth: '300px', fontSize: '14px', lineHeight: 1.6 }}>
               <strong style={{ color: '#FFF', fontSize: '16px' }}>We value your privacy.</strong><br />
-              Our infrastructure uses tracking cookies to structurally enhance your browsing layout patterns and optimize backend tracking parameters. Clicking "Yes, Accept" confirms your alignment.
+              We use essential cookies to run Welrent Act and optional analytics to improve the contracts experience. Clicking &quot;Yes, Accept&quot; confirms your consent.
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
+                type="button"
                 onClick={acceptCookies}
                 style={{
                   backgroundColor: '#8EB9FF',
@@ -97,7 +118,7 @@ export default function Footer() {
                   fontWeight: 700,
                   cursor: 'pointer',
                   fontSize: '15px',
-                  boxShadow: '0 4px 10px rgba(142,185,255,0.2)'
+                  boxShadow: '0 4px 10px rgba(142,185,255,0.2)',
                 }}
               >
                 Yes, Accept

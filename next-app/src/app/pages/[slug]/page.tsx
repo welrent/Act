@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import { ensureSchema } from "@/lib/ensure-schema";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -21,13 +22,13 @@ async function getSettings(): Promise<Record<string, string>> {
 function replacePlaceholders(content: string, settings: Record<string, string>): string {
   let result = content;
   for (const [key, value] of Object.entries(settings)) {
-    // Replace [KEY] with value
     result = result.split(`[${key}]`).join(value);
   }
   return result;
 }
 
 export default async function DynamicPage({ params }: PageProps) {
+  await ensureSchema();
   const { slug } = await params;
 
   const [pageResult, settings] = await Promise.all([

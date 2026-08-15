@@ -24,20 +24,23 @@ export default function Home() {
           Welcome
         </h1>
         <p style={{ color: "#8EB9FF", fontSize: "16px", marginTop: "8px", marginBottom: "0px", fontWeight: 500, textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}>
-          Manage all your rental agreements with ease.
+          Smart rental contracts for cars and motorcycles — synced with the main Welrent site.
         </p>
       </div>
 
       {/* Rental Agreements Pills - 1:1 Match to Image */}
       <div className="rental-cards-container">
         <Link href="/pages/car-rental-agreement" className="rental-card-pill">
-          Contrat de location de voiture
+          Car rental contract
+        </Link>
+        <Link href="/pages/motorcycle-rental-agreement" className="rental-card-pill">
+          Motorcycle rental contract
         </Link>
         <Link href="/pages/boat-rental-agreement" className="rental-card-pill">
-          Contrat de location de bateau
+          Boat rental contract
         </Link>
         <Link href="/pages/equipment-rental-agreement" className="rental-card-pill">
-          Contrat de location d'équipement
+          Equipment rental contract
         </Link>
       </div>
 

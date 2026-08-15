@@ -1,9 +1,11 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { ensureSchema } from '@/lib/ensure-schema';
 
 export async function POST(request: Request) {
   try {
+    await ensureSchema();
     const { idToken, email, uid } = await request.json();
 
     if (!email || !uid) {

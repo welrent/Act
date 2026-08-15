@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/client';
+import { auth, isFirebaseConfigured } from '@/lib/firebase/client';
 
 interface AuthContextType {
   user: User | null;
@@ -29,28 +29,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
+    if (!isFirebaseConfigured) {
+      // Local/demo mode without Firebase credentials
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
+
       if (currentUser) {
-        // Sync with backend session
-        const idToken = await currentUser.getIdToken();
-        const res = await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            idToken, 
-            email: currentUser.email, 
-            uid: currentUser.uid 
-          }),
-        });
-        const data = await res.json();
-        if (data.role) {
-          setRole(data.role);
+        try {
+          const idToken = await currentUser.getIdToken();
+          const res = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              idToken,
+              email: currentUser.email,
+              uid: currentUser.uid,
+            }),
+          });
+          const data = await res.json();
+          if (data.role) {
+            setRole(data.role);
+          }
+        } catch (error) {
+          console.warn('[Welrent Act] Session sync failed:', error);
         }
       } else {
-        // Clear backend session
-        await fetch('/api/auth/session', { method: 'DELETE' });
+        try {
+          await fetch('/api/auth/session', { method: 'DELETE' });
+        } catch {
+          /* ignore */
+        }
         setRole('user');
       }
 
@@ -61,7 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await firebaseSignOut(auth);
+    if (isFirebaseConfigured) {
+      await firebaseSignOut(auth);
+    }
     setUser(null);
     setRole('user');
   };
