@@ -15,6 +15,7 @@ export default function Sidebar() {
         { name: 'Dashboard', href: '/' },
         { name: 'My Profile', href: '/profile' },
         { name: 'Car Agreements', href: '/pages/car-rental-agreement' },
+        { name: 'Motorcycle Agreements', href: '/pages/motorcycle-rental-agreement' },
         { name: 'Boat Agreements', href: '/pages/boat-rental-agreement' },
         { name: 'Equipment Agreements', href: '/pages/equipment-rental-agreement' },
       ]

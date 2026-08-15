@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
+import { ensureSchema } from "@/lib/ensure-schema";
 
 export default async function AgreementsPage() {
+  await ensureSchema();
   const { rows: agreements } = await db.execute("SELECT * FROM agreements ORDER BY title ASC");
 
   return (
@@ -28,9 +30,12 @@ export default async function AgreementsPage() {
                   {agreement.description}
                 </p>
                 <div className="mt-auto">
-                  <button className="border border-[#2D3ED2] text-[#2D3ED2] hover:bg-[#2D3ED2] hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-all">
+                  <a
+                    href="/agreements"
+                    className="inline-block border border-[#2D3ED2] text-[#2D3ED2] hover:bg-[#2D3ED2] hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-all"
+                  >
                     Read Agreement
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

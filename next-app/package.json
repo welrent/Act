@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:demo": "tsx src/lib/seed-demo-contracts.ts",
+    "seed:agreements": "tsx src/lib/seed-agreements.ts",
+    "migrate": "tsx src/lib/migrate.ts",
+    "test:sdk": "node ../scripts/test-sdk.mjs",
+    "test:api": "node ../scripts/test-api.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",
@@ -29,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }

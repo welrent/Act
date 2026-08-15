@@ -6,3 +6,8 @@ openJdk-25.jdk.zip
 node_modules/
 **/node_modules/
 .next/
+next-app/.data/
+**/.data/
+*.db
+.env.local
+next-app/.env.local

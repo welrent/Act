@@ -256,6 +256,53 @@ const agreements = [
 </article>`
   },
   {
+    slug: 'motorcycle-rental-agreement',
+    title: 'Motorcycle Rental Agreement',
+    content: `<article class="legal-document">
+
+<h1>Motorcycle Rental Agreement</h1>
+<p class="legal-meta">
+  <strong>Welrent AutoVerhuur</strong><br>
+  [COMPANY_ADDRESS]<br>
+  Chamber of Commerce: [CHAMBER_OF_COMMERCE_NUMBER]<br>
+  VAT Number: [VAT_NUMBER]<br>
+  Email: <a href="mailto:[EMAIL]">[EMAIL]</a> &nbsp;|&nbsp; Phone: [PHONE_NUMBER]<br>
+  <em>Last updated: 2026</em>
+</p>
+
+<hr>
+
+<h2>Article 1 – Parties & Definitions</h2>
+<p><strong>Lessor:</strong> Welrent AutoVerhuur, registered at [COMPANY_ADDRESS].<br>
+<strong>Renter:</strong> The individual who enters into this motorcycle or scooter rental agreement.<br>
+<strong>Motorcycle:</strong> The two-wheeled motor vehicle described in the booking confirmation, including scooters where applicable.<br>
+<strong>Rental Period:</strong> The period from handover until confirmed return of the Motorcycle.</p>
+
+<h2>Article 2 – Licence & Age Requirements</h2>
+<ul>
+  <li>A valid category A / A1 / A2 (or Dutch equivalent) driving licence is required for the Motorcycle class rented.</li>
+  <li>Minimum age is <strong>21 years</strong> unless otherwise stated for light scooters.</li>
+  <li>An International Driving Permit is required for non-EU licences.</li>
+</ul>
+
+<h2>Article 3 – Safety Equipment</h2>
+<p>A certified helmet must be worn at all times while riding. Additional protective gear (jacket, gloves) is strongly recommended. Passengers, where permitted, must also wear a helmet.</p>
+
+<h2>Article 4 – Permitted & Prohibited Use</h2>
+<p>The Motorcycle may only be used on public roads within the agreed territory and by the named Renter. Racing, off-road use, towing, stunt riding, and riding under the influence of alcohol or drugs are strictly prohibited.</p>
+
+<h2>Article 5 – Insurance & Deposit</h2>
+<p>Third-party liability and basic collision cover apply as stated in the booking. A security deposit is required at collection and released within <strong>7 business days</strong> after compliant return.</p>
+
+<h2>Article 6 – Damage, Theft & Return</h2>
+<p>Damage and theft must be reported immediately. The Motorcycle must be returned on time, with the agreed fuel level, and locked with the provided security devices.</p>
+
+<h2>Article 7 – Governing Law</h2>
+<p>This agreement is governed by Dutch law. Standard Welrent Act terms for motor vehicle rentals apply where not superseded above.</p>
+
+</article>`
+  },
+  {
     slug: 'equipment-rental-agreement',
     title: 'Equipment Rental Agreement',
     content: `<article class="legal-document">
@@ -395,6 +442,7 @@ async function updateAgreements() {
   console.log('\n🎉 All agreement pages updated successfully!');
   console.log('\n📌 Pages are now live at:');
   console.log('   /pages/car-rental-agreement');
+  console.log('   /pages/motorcycle-rental-agreement');
   console.log('   /pages/boat-rental-agreement');
   console.log('   /pages/equipment-rental-agreement');
   console.log('\n📝 Replace placeholders via the Site Text Editor at /secret-panel/editor');
